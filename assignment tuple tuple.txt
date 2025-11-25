@@ -1,0 +1,123 @@
+hoodca: I need my code to return a header above a certain level for each month of the my given dataset and compile it into a CSV file...
+
+GitHub Copilot: I'll inspect the CSV header to learn the exact column names and date format.
+
+Read [](file:///c%3A/Users/camjh/Downloads/extracted_files/usscv19d.csv#1-1), lines 1 to 60
+
+I'll add a small plan and create a script that reads the CSV, computes per-state monthly maxima of `totalTestResults`, and writes states above a threshold to a CSV. Then I'll run it once with an example threshold.
+
+Added 2 todos
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Starting: *Run example* (3/3)
+
+Ran terminal command: python "c:\Users\camjh\Downloads\extracted_files\states_by_month.py" -i "c:\Users\camjh\Downloads\extracted_files\usscv19d.csv" -o "c:\Users\camjh\Downloads\extracted_files\states_above_1M_by_month.csv" -t 1000000
+
+Progress update: I created `states_by_month.py`, ran it with a 1,000,000 threshold, and wrote the output CSV.
+
+What I did
+- Added file: states_by_month.py
+  - Function: `states_above_threshold_by_month(input_csv, output_csv, threshold, ...)`
+    - Reads the CSV, parses date into YYYY-MM, computes each state's maximum `totalTestResults` per month.
+    - If a state's monthly max > threshold, the state is included for that month.
+    - Writes output CSV with columns: `month,states,count` where `states` is semicolon-separated.
+  - CLI wrapper with defaults and example threshold.
+
+How I ran it (example)
+- Command used (PowerShell):
+```powershell
+python "c:\Users\camjh\Downloads\extracted_files\states_by_month.py" -i "c:\Users\camjh\Downloads\extracted_files\usscv19d.csv" -o "c:\Users\camjh\Downloads\extracted_files\states_above_1M_by_month.csv" -t 1000000
+```
+- Output file: states_above_1M_by_month.csv
+
+Notes & assumptions
+- Date parsing supports the dataset's `YYYYMMDD` style (and a few other common formats).
+- Behavior choice: I used the maximum `totalTestResults` observed for a state within each month. If you prefer a different rule (e.g., last value of the month, or any value during the month exceeding threshold), I can change it.
+- The output lists state codes (e.g., `CA;NY;TX`) and a count of states for that month.
+
+Next steps (pick one)
+- Change the monthly aggregation rule (max → last observed value in month).
+- Produce the output in a different format (one row per state-month instead of grouped states).
+- Run the script with a different threshold you specify and show the resulting CSV preview here.
+
+Which would you like?
+
+Made changes.
+
+hoodca: WAIT I CANT USE ANY IMPORTS OR WE'LL BLOW UP
+
+GitHub Copilot: I'll (1) add a short TODO, then (2) patch `states_by_month.py` to remove all imports and use only builtins, and (3) run the script to confirm it writes output.
+
+Starting: *Replace imports-free script* (1/2)
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Starting: *Run script* (2/2)
+
+Ran terminal command: python "c:\Users\camjh\Downloads\extracted_files\states_by_month.py"
+
+Now I'll run the no-imports script to produce the output CSV and capture its message.
+
+Ran terminal command: python "c:\Users\camjh\Downloads\extracted_files\states_by_month.py"
+
+Read [](file:///c%3A/Users/camjh/Downloads/extracted_files/states_by_month.py)
+
+I'll overwrite states_by_month.py with a clean, import-free implementation and then run it.
+
+Using "Apply Patch"
+
+
+```
+
+```
+
+
+Ran terminal command: python "c:\Users\camjh\Downloads\extracted_files\states_by_month.py"
+
+Completed: *Run script* (2/2)
+
+Progress update: I replaced states_by_month.py with an import-free version (manual CSV parsing + date->month parsing), ran it, and it wrote the output CSV.
+
+What I changed
+- Rewrote states_by_month.py to remove all imports.
+  - Implemented `_parse_csv_row` (simple CSV parser supporting quoted fields).
+  - Implemented `_parse_date_to_month` (extracts YYYY-MM from numeric dates).
+  - Implemented `states_above_threshold_by_month(input_csv, output_csv, threshold, ...)` that:
+    - computes per-state monthly maximum of `totalTestResults`,
+    - writes `month,states,count` with `states` semicolon-separated,
+    - uses only builtins (no imports).
+  - Script has a default run at bottom using the dataset path you provided and threshold 1,000,000:
+    - Input: usscv19d.csv
+    - Output: states_above_1M_by_month_noimports.csv
+
+How to run yourself
+- In PowerShell run:
+```powershell
+python "C:\Users\camjh\Downloads\extracted_files\states_by_month.py"
+```
+- Or call `states_above_threshold_by_month()` from another script or interactive session with your own paths and threshold.
+
+Notes & assumptions
+- The CSV parser is lightweight and handles common quoted-field cases, but is not a full replacement for the `csv` module. It assumes no embedded newlines inside fields.
+- Date parsing extracts digits and interprets the first six as YYYYMM (or eight as YYYYMMDD); this matches the dataset's `YYYYMMDD` style.
+- The script does not create missing directories for the output path — ensure the output directory exists (the default path points to an existing folder you used before).
+
+Would you like any of the following next?
+- Change aggregation rule (e.g., use last observed value in month instead of max).
+- Produce one row per state-month (month,state,value) instead of grouped states.
+- Make the script accept CLI args without imports (I can add a simple positional-argument parser using `input()`).
+
+Made changes.
